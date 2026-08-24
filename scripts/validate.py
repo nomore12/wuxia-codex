@@ -171,7 +171,9 @@ def check_forbidden(text: str, rep: Report, offset: int) -> None:
             if word in line:
                 rep.warn(i, f"확인 필요 '{word}' — {why}: {line.strip()[:60]}")
         for tier in FORBIDDEN_TIERS:
-            if tier in line:
+            # 앞에 한글이 붙어 있으면 다른 낱말의 꼬리다 (남화경의 '화경')
+            # 뒤는 막지 않는다. '화경에', '절정의'처럼 조사가 붙는 것이 정상이다
+            if re.search(rf"(?<![가-힣]){tier}", line):
                 rep.error(i, f"등급 표현 '{tier}' — 공인 등급표는 존재하지 않는다")
 
 
