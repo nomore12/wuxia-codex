@@ -40,6 +40,14 @@
 
 ---
 
+## 초기 설정
+
+클론 후 한 번 실행한다. 커밋 메시지에서 공동저자 표기를 제거하는 훅이 켜진다.
+
+    git config core.hooksPath .githooks
+
+---
+
 ## 문서 상태
 
 모든 문서는 frontmatter에 `status`를 갖는다.
