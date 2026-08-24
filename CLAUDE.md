@@ -107,9 +107,13 @@ frontmatter의 `sect_id`는 영문(`sorim`, `dangga`, `cheonma`).
 2. `specs/세력별_차별화지시.md`에서 해당 세력의 지시를 확인한다
    — 카테고리 구성, 규모, 서술 형식이 세력마다 다르다
 3. 생성한다
-4. `python scripts/validate.py <파일>` 을 실행한다
-5. 통과하면 색인에 신규 항목을 추가한다
-6. **작업 보고를 남긴다** — 항목 수, origin 비율, 색인 충돌, 판단이 필요한 것
+4. `python scripts/validate.py <파일>` — 통과할 때까지 고친다
+5. `python scripts/build_index.py` — 색인을 재생성한다
+6. `python scripts/validate.py --all` — 다른 세력과의 충돌을 확인한다
+7. **작업 보고를 남긴다** — 항목 수, origin 비율, 색인 충돌, 판단이 필요한 것
+
+**색인은 손으로 편집하지 않는다.** 항상 build_index.py로 재생성한다.
+`canon/` 아래에 있으나 기계가 관리하는 파일이므로 이 갱신은 수정 금지의 예외다.
 
 ### 서술 형식을 통일하지 않는다
 
@@ -138,4 +142,7 @@ frontmatter의 `sect_id`는 영문(`sorim`, `dangga`, `cheonma`).
 - 생성된 도구 서명(`Generated with...`)도 넣지 않는다.
 - **validate.py를 통과한 뒤에만 커밋한다.**
 - 커밋 단위는 세력 하나. 메시지는 `1차: {세력명}` 형식.
-- `canon/` 변경이 포함된 커밋은 만들지 않는다.
+- **`canon/` 변경은 별도 커밋으로 분리한다.**
+  자기 판단으로 canon을 수정하지 않는다는 것이지, 커밋하지 말라는 뜻이 아니다.
+  작성자가 지시한 변경과 build_index.py의 색인 갱신은 정상 커밋 대상이다.
+  메시지에 지시받은 내용임을 남긴다.

@@ -34,7 +34,8 @@
 ├─ 미확정사항.md                  미확정 사항. 임의로 채우지 않는다
 │
 └─ scripts/
-    └─ validate.py                형식·금지어·중복 검증
+    ├─ validate.py                형식·금지어·중복 검증
+    └─ build_index.py             무공색인.md 재생성
 ```
 
 ---
