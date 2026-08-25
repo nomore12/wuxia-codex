@@ -120,6 +120,8 @@ frontmatter의 `sect_id`는 영문(`sorim`, `dangga`, `cheonma`).
 6. `python scripts/validate.py --all` — 다른 세력과의 충돌을 확인한다
 7. **작업 보고를 남긴다** — 항목 수, origin 비율, 색인 충돌, 판단이 필요한 것
 
+- 관계 단서가 나오면 `drafts/세력관계.md`에 추가한다.
+
 **색인은 손으로 편집하지 않는다.** 항상 build_index.py로 재생성한다.
 `canon/` 아래에 있으나 기계가 관리하는 파일이므로 이 갱신은 수정 금지의 예외다.
 

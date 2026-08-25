@@ -5,7 +5,7 @@
 사용법:
     python scripts/validate.py drafts/factions/화산파.md
     python scripts/validate.py drafts/factions/          # 디렉토리 전체
-    python scripts/validate.py --all                     # drafts/ 전체
+    python scripts/validate.py --all                     # drafts/factions/ 전체
 
 종료 코드: 0 통과 / 1 오류 있음
 """
@@ -378,10 +378,12 @@ def collect(targets: list[str]) -> list[Path]:
 def main() -> int:
     ap = argparse.ArgumentParser(description="세력 문서 검증")
     ap.add_argument("targets", nargs="*", help="파일 또는 디렉토리")
-    ap.add_argument("--all", action="store_true", help="drafts/ 전체 검사")
+    ap.add_argument("--all", action="store_true", help="drafts/factions/ 전체 검사")
     args = ap.parse_args()
 
-    targets = args.targets or ([str(ROOT / "drafts")] if args.all else [])
+    # drafts/ 아래에는 세력 문서가 아닌 것도 있다(세력관계.md 등).
+    # 이 검증기는 세력 문서만 본다.
+    targets = args.targets or ([str(ROOT / "drafts" / "factions")] if args.all else [])
     if not targets:
         ap.print_help()
         return 1
