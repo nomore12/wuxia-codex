@@ -44,6 +44,15 @@ FORBIDDEN_TIERS = [
 
 VALID_ORIGINS = {"전승", "관용", "창작"}
 
+# 세력 문서의 최상위 절(## )이 그 항목의 층을 정한다. canon/body-and-mind/06 §6
+LAYERS = {"심법": "심법", "무공": "무공", "기술": "기술", "물": "물"}
+
+# 기술과 물의 kind는 정전이 못박았다. 무공의 kind는 세력마다 새로 생기므로 열어둔다
+VALID_KINDS = {
+    "기술": {"제작", "지식"},
+    "물": {"독", "암기", "기관물", "영약", "신병"},
+}
+
 REQUIRED_SECTIONS = ["## 개요", "## 심법", "## 무공", "## 대표 무공"]
 
 # 1차에서 다루지 않는 것
@@ -57,7 +66,8 @@ class Entry:
     hanja: str
     origin: str
     note: str
-    kind: str            # '심법' 또는 무공 kind
+    layer: str           # 무공 | 심법 | 기술 | 물
+    kind: str            # '심법' 또는 각 층의 kind
     is_daepyo: bool
     line: int
 
@@ -113,6 +123,7 @@ def parse_row(line: str) -> list[str]:
 def parse_entries(body: str, offset: int, rep: Report) -> None:
     """`| 명칭 | 한자 | origin | 비고 |` 형태의 표에서 항목을 수집한다."""
     current_kind = "?"
+    current_layer = "?"
     in_target_table = False
 
     for i, raw in enumerate(body.split("\n"), start=offset):
@@ -122,6 +133,9 @@ def parse_entries(body: str, offset: int, rep: Report) -> None:
             heading = line.lstrip("#").strip()
             # '### 검법 (劍法)' -> '검법'
             current_kind = re.sub(r"\s*\(.*?\)\s*", "", heading).strip()
+            # '## 무공' 처럼 최상위 절이면 층이 바뀐다
+            if re.match(r"^##[^#]", line):
+                current_layer = LAYERS.get(current_kind, "?")
             in_target_table = False
             continue
 
@@ -151,7 +165,7 @@ def parse_entries(body: str, offset: int, rep: Report) -> None:
         clean = re.sub(r"\*\*|\[대표\]", "", name).strip()
 
         rep.entries.append(
-            Entry(clean, hanja, origin, note, current_kind, is_daepyo, i)
+            Entry(clean, hanja, origin, note, current_layer, current_kind, is_daepyo, i)
         )
 
 
@@ -223,6 +237,14 @@ def check_entries(rep: Report) -> None:
 
         if e.origin not in VALID_ORIGINS:
             rep.error(e.line, f"origin 태그 오류: {e.name} → '{e.origin}'")
+
+        allowed = VALID_KINDS.get(e.layer)
+        if allowed and e.kind not in allowed:
+            rep.error(
+                e.line,
+                f"{e.layer}의 kind는 {' | '.join(sorted(allowed))}만 쓴다: "
+                f"{e.name} → '{e.kind}'",
+            )
 
         if e.name in seen:
             rep.error(e.line, f"문서 내 중복: {e.name} (L{seen[e.name]})")

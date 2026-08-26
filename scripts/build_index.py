@@ -48,8 +48,13 @@ generated_by: scripts/build_index.py
 | 같은 이름이 다른 세력에 있음 | 임의로 결정하지 말고 보고 |
 
 `세력` 열은 사람이 읽기 위한 것이고, 대조에 쓰이는 것은 `sect_id` 열이다.
+`층`은 무공·심법·기술·물 넷이며, 세력 문서의 최상위 절에서 뽑는다.
 
 """
+
+
+# 세력 문서의 최상위 절(## )이 그 항목의 층을 정한다. canon/body-and-mind/06 §6
+LAYERS = {"심법": "심법", "무공": "무공", "기술": "기술", "물": "물"}
 
 
 @dataclass
@@ -59,6 +64,7 @@ class Row:
     origin: str
     sect_name: str
     sect_id: str
+    layer: str
     kind: str
 
 
@@ -97,13 +103,18 @@ def read_faction(path: Path) -> tuple[list[Row], list[str]]:
 
     rows: list[Row] = []
     kind = "?"
+    layer = "?"
     in_table = False
 
     for raw in body.split("\n"):
         line = raw.strip()
 
         if line.startswith("#"):
-            kind = re.sub(r"\s*\(.*?\)\s*", "", line.lstrip("#").strip()).strip()
+            heading = re.sub(r"\s*\(.*?\)\s*", "", line.lstrip("#").strip()).strip()
+            # '## 무공' 처럼 최상위 절이면 층이 바뀐다. 그 아래 '### 검법'은 kind다
+            if re.match(r"^##[^#]", line):
+                layer = LAYERS.get(heading, "?")
+            kind = heading
             in_table = False
             continue
 
@@ -121,7 +132,7 @@ def read_faction(path: Path) -> tuple[list[Row], list[str]]:
             continue
 
         name = re.sub(r"\*\*|\[대표\]", "", cells[0]).strip()
-        rows.append(Row(name, cells[1], cells[2], sect_name, sect_id, kind))
+        rows.append(Row(name, cells[1], cells[2], sect_name, sect_id, layer, kind))
 
     if not rows:
         warns.append(f"{path.name}: 수집된 항목이 없다")
@@ -153,14 +164,14 @@ def build() -> tuple[str, list[str], list[Row], list[str]]:
             else:
                 warns.append(f"공통 무공: {name} — {', '.join(sorted(sects))}")
 
-    rows.sort(key=lambda r: (r.sect_id, r.kind, r.name))
+    rows.sort(key=lambda r: (r.sect_id, r.layer, r.kind, r.name))
 
     lines = [HEADER.rstrip("\n"), ""]
-    lines.append("| 명칭 | 한자 | origin | 세력 | sect_id | 분류 |")
-    lines.append("|---|---|---|---|---|---|")
+    lines.append("| 명칭 | 한자 | origin | 세력 | sect_id | 층 | 분류 |")
+    lines.append("|---|---|---|---|---|---|---|")
     for r in rows:
         lines.append(
-            f"| {r.name} | {r.hanja} | {r.origin} | {r.sect_name} | {r.sect_id} | {r.kind} |"
+            f"| {r.name} | {r.hanja} | {r.origin} | {r.sect_name} | {r.sect_id} | {r.layer} | {r.kind} |"
         )
     lines.append("")
     return "\n".join(lines), warns, rows, errors
