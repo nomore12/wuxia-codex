@@ -2,7 +2,7 @@
 """
 무공·심법 색인 생성기.
 
-drafts/factions/ 아래 모든 세력 문서를 훑어 canon/무공색인.md를 다시 만든다.
+drafts/factions/ 아래 모든 세력 문서를 훑어 canon/명칭색인.md를 다시 만든다.
 색인은 **손으로 관리하지 않는다.** 항상 이 스크립트로 재생성한다.
 
 사용법:
@@ -25,7 +25,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 FACTIONS_DIR = ROOT / "drafts" / "factions"
-INDEX_PATH = ROOT / "canon" / "무공색인.md"
+INDEX_PATH = ROOT / "canon" / "명칭색인.md"
 
 HEADER = """---
 doc_type: canon

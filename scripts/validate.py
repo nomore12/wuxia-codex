@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-INDEX_PATH = ROOT / "canon" / "무공색인.md"
+INDEX_PATH = ROOT / "canon" / "명칭색인.md"
 VARIANCE_PATH = ROOT / "specs" / "세력별_차별화지시.md"
 
 # ── 세계관 금지 규칙 ────────────────────────────────────────────────
