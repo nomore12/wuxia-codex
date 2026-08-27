@@ -253,7 +253,7 @@ def check_entries(rep: Report) -> None:
 
     daepyo = [e for e in rep.entries if e.is_daepyo]
     if not 3 <= len(daepyo) <= 5:
-        rep.error(None, f"대표 무공은 3~5개여야 한다. 현재 {len(daepyo)}개")
+        rep.error(None, f"대표 항목은 3~5개여야 한다. 현재 {len(daepyo)}개")
 
     simbeop = [e for e in rep.entries if "심법" in e.kind]
     if not simbeop:
