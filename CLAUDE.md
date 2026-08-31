@@ -111,7 +111,15 @@ frontmatter의 `sect_id`는 영문(`sorim`, `dangga`, `cheonma`).
 
 ## 생성 작업 절차
 
-1. `canon/명칭색인.md`를 **먼저 조회**한다. 중복을 피하기 위함이다
+1. **색인을 조회한다.** 전문을 읽지 말고 스크립트를 쓴다.
+
+   ```
+   python scripts/check_name.py --sect {참조할 세력들}   # 피해야 할 어휘 확인
+   python scripts/check_name.py {후보 명칭들}            # 중복 확인
+   python scripts/check_name.py --hanja {글자}           # 어휘층 겹침 확인
+   ```
+
+   `canon/명칭색인.md`는 800줄이 넘는다. 전문을 읽으면 컨텍스트를 크게 먹는다.
 2. `specs/세력별_차별화지시.md`에서 해당 세력의 지시를 확인한다
    — 카테고리 구성, 규모, 서술 형식이 세력마다 다르다
 3. 생성한다
