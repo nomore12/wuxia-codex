@@ -111,6 +111,9 @@ def read_faction(path: Path) -> tuple[list[Row], list[str]]:
 
         if line.startswith("#"):
             heading = re.sub(r"\s*\(.*?\)\s*", "", line.lstrip("#").strip()).strip()
+            # 한자 괄호를 뗀 자리에 공백이 남는다. 「계도· 방편」 → 「계도·방편」
+            heading = re.sub(r"\s*·\s*", "·", heading)
+            heading = re.sub(r"\s+", " ", heading)
             # '## 무공' 처럼 최상위 절이면 층이 바뀐다. 그 아래 '### 검법'은 kind다
             if re.match(r"^##[^#]", line):
                 layer = LAYERS.get(heading, "?")
