@@ -21,6 +21,7 @@ import argparse
 import re
 import sys
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -180,6 +181,19 @@ def build() -> tuple[str, list[str], list[Row], list[str]]:
     return "\n".join(lines), warns, rows, errors
 
 
+@lru_cache(maxsize=1)
+def is_current() -> bool:
+    """색인 파일이 세력 문서에서 다시 만든 것과 같은가.
+
+    **mtime을 보지 않는다.** 파일을 열기만 해도 mtime이 바뀌어 오탐이 난다.
+    validate.py와 check_name.py가 이 함수를 부른다. 세 스크립트가 같은 답을 내야 한다.
+    """
+    if not INDEX_PATH.exists():
+        return False
+    content, _, _, _ = build()
+    return INDEX_PATH.read_text(encoding="utf-8") == content
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="무공·심법 색인 생성")
     ap.add_argument("--check", action="store_true", help="변경 여부만 확인")
@@ -200,7 +214,7 @@ def main() -> int:
     old = INDEX_PATH.read_text(encoding="utf-8") if INDEX_PATH.exists() else ""
 
     if args.check:
-        if old == content:
+        if is_current():
             print("색인이 최신이다.")
             return 0
         print("색인이 최신이 아니다. build_index.py를 실행할 것.", file=sys.stderr)

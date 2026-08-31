@@ -18,6 +18,8 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from build_index import is_current
+
 ROOT = Path(__file__).resolve().parent.parent
 INDEX_PATH = ROOT / "canon" / "명칭색인.md"
 VARIANCE_PATH = ROOT / "specs" / "세력별_차별화지시.md"
@@ -307,15 +309,11 @@ def check_index(rep: Report, sect_id: str) -> None:
 
 
 def check_index_freshness(rep: Report) -> None:
-    """색인이 세력 문서보다 오래되었으면 알린다."""
+    """색인이 세력 문서와 다르면 알린다. build_index.py가 내용으로 판정한다."""
     if not INDEX_PATH.exists():
         return
-    factions = ROOT / "drafts" / "factions"
-    if not factions.exists():
-        return
-    newest = max((p.stat().st_mtime for p in factions.glob("*.md")), default=0)
-    if newest > INDEX_PATH.stat().st_mtime:
-        rep.warn(None, "색인이 세력 문서보다 오래되었다 — build_index.py를 실행할 것")
+    if not is_current():
+        rep.warn(None, "색인이 세력 문서와 다르다 — build_index.py를 실행할 것")
 
 
 def report_origin_ratio(rep: Report, sect_id: str) -> None:
