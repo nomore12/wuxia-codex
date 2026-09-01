@@ -26,6 +26,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 FACTIONS_DIR = ROOT / "drafts" / "factions"
+# 세력이 아닌 것들의 모음. 낭인·은둔한 자의 무공이 여기 있다
+OTHERS_DIR = ROOT / "drafts" / "others"
+SOURCE_DIRS = (FACTIONS_DIR, OTHERS_DIR)
 INDEX_PATH = ROOT / "canon" / "명칭색인.md"
 
 HEADER = """---
@@ -150,10 +153,13 @@ def build() -> tuple[str, list[str], list[Row], list[str]]:
     rows: list[Row] = []
     warns: list[str] = []
     errors: list[str] = []
-    for p in sorted(FACTIONS_DIR.glob("*.md")):
-        r, w = read_faction(p)
-        rows.extend(r)
-        warns.extend(w)
+    for d in SOURCE_DIRS:
+        if not d.exists():
+            continue
+        for p in sorted(d.glob("*.md")):
+            r, w = read_faction(p)
+            rows.extend(r)
+            warns.extend(w)
 
     # 같은 명칭이 여러 세력에 있는 경우를 알린다
     by_name: dict[str, list[Row]] = {}

@@ -398,12 +398,13 @@ def collect(targets: list[str]) -> list[Path]:
 def main() -> int:
     ap = argparse.ArgumentParser(description="세력 문서 검증")
     ap.add_argument("targets", nargs="*", help="파일 또는 디렉토리")
-    ap.add_argument("--all", action="store_true", help="drafts/factions/ 전체 검사")
+    ap.add_argument("--all", action="store_true", help="drafts/factions/ 와 drafts/others/ 전체 검사")
     args = ap.parse_args()
 
     # drafts/ 아래에는 세력 문서가 아닌 것도 있다(세력관계.md 등).
     # 이 검증기는 세력 문서만 본다.
-    targets = args.targets or ([str(ROOT / "drafts" / "factions")] if args.all else [])
+    all_dirs = [str(ROOT / "drafts" / "factions"), str(ROOT / "drafts" / "others")]
+    targets = args.targets or (all_dirs if args.all else [])
     if not targets:
         ap.print_help()
         return 1
