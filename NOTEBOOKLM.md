@@ -61,7 +61,7 @@ NotebookLM에서 자료가 충돌할 때는 다음 순서를 따른다.
 - `README.md`
 - `AGENTS.md`
 - `NOTEBOOKLM.md`
-- `보완사항.md`
+- `drafts/보완사항.md`
 - `specs/1차작업규칙.md`
 - `specs/세력별_차별화지시.md`
 - `specs/작업순서.md`
