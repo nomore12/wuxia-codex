@@ -57,6 +57,11 @@ VALID_KINDS = {
 
 REQUIRED_SECTIONS = ["## 개요", "## 심법", "## 무공", "## 대표 항목"]
 
+# 모음 문서는 세력 문서가 아니다. 모인 것들 사이에 관계가 없으므로
+# 「무엇의 대표인가」가 성립하지 않는다. 대표 관련 검사를 받지 않는다.
+COLLECTION_DOC_TYPE = "collection"
+COLLECTION_EXEMPT_SECTIONS = ["## 대표 항목"]
+
 # 1차에서 다루지 않는 것
 PHASE1_FORBIDDEN_SECTIONS = ["## 초식", "## 절기", "## 인물", "## 연표"]
 
@@ -203,7 +208,10 @@ def check_structure(body: str, meta: dict[str, str], rep: Report) -> None:
         if meta.get("doc_type") == "canon":
             rep.error(None, "drafts 문서의 doc_type이 canon이다. 승격은 작성자만 한다")
 
-    for sec in REQUIRED_SECTIONS:
+    is_collection = meta.get("doc_type") == COLLECTION_DOC_TYPE
+    required = [s for s in REQUIRED_SECTIONS
+                if not (is_collection and s in COLLECTION_EXEMPT_SECTIONS)]
+    for sec in required:
         if sec not in body:
             rep.error(None, f"필수 절 누락: '{sec}'")
 
@@ -221,7 +229,7 @@ def check_structure(body: str, meta: dict[str, str], rep: Report) -> None:
             rep.error(None, why)
 
 
-def check_entries(rep: Report) -> None:
+def check_entries(rep: Report, is_collection: bool = False) -> None:
     if not rep.entries:
         rep.error(None, "수집된 항목이 없다. 표 형식을 확인할 것")
         return
@@ -253,9 +261,10 @@ def check_entries(rep: Report) -> None:
         else:
             seen[e.name] = e.line
 
-    daepyo = [e for e in rep.entries if e.is_daepyo]
-    if not 3 <= len(daepyo) <= 5:
-        rep.error(None, f"대표 항목은 3~5개여야 한다. 현재 {len(daepyo)}개")
+    if not is_collection:
+        daepyo = [e for e in rep.entries if e.is_daepyo]
+        if not 3 <= len(daepyo) <= 5:
+            rep.error(None, f"대표 항목은 3~5개여야 한다. 현재 {len(daepyo)}개")
 
     simbeop = [e for e in rep.entries if "심법" in e.kind]
     if not simbeop:
@@ -363,7 +372,7 @@ def validate(path: Path) -> Report:
     check_forbidden(body, rep, offset)
     check_structure(body, meta, rep)
     parse_entries(body, offset, rep)
-    check_entries(rep)
+    check_entries(rep, meta.get("doc_type") == COLLECTION_DOC_TYPE)
     check_index(rep, sect_id)
     check_index_freshness(rep)
     # 차별화 지시는 세력명(한글)으로 적혀 있으므로 파일명으로도 찾아본다
