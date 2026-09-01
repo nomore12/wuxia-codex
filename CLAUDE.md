@@ -158,6 +158,8 @@ frontmatter의 `sect_id`는 영문(`sorim`, `dangga`, `cheonma`).
 
 - 커밋 메시지에 **공동저자(Co-Authored-By) 표기를 넣지 않는다.**
 - 생성된 도구 서명(`Generated with...`)도 넣지 않는다.
+- **세션 링크(`Claude-Session:`)를 넣지 않는다.**
+  도구가 기본으로 붙이려 하므로 매번 빼야 한다.
 - **validate.py를 통과한 뒤에만 커밋한다.**
 - 커밋 단위는 세력 하나. 메시지는 `1차: {세력명}` 형식.
 - **`canon/` 변경은 별도 커밋으로 분리한다.**
