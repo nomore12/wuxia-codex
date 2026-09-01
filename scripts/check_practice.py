@@ -78,12 +78,20 @@ def candidates(text: str) -> dict[str, str]:
     return found
 
 
+def show(path: Path) -> str:
+    """저장소 안이면 상대경로로, 밖이면 있는 그대로 보인다."""
+    try:
+        return str(path.relative_to(ROOT))
+    except ValueError:
+        return str(path)
+
+
 def collect(targets: list[str], use_all: bool) -> list[Path]:
     if use_all:
         return sorted(PRACTICE_DIR.rglob("*.md")) if PRACTICE_DIR.exists() else []
     paths: list[Path] = []
     for t in targets:
-        p = Path(t)
+        p = Path(t).resolve()
         if p.is_dir():
             paths.extend(sorted(p.rglob("*.md")))
         elif p.exists():
@@ -117,7 +125,7 @@ def main() -> int:
         missing = {n: h for n, h in found.items() if n not in known}
         present = sorted(n for n in found if n in known)
 
-        print(f"\n{path.relative_to(ROOT)}")
+        print(f"\n{show(path)}")
 
         # 한자를 달고 나온 것은 거의 명칭이다. 그렇지 않은 것은 오탐이 섞인다.
         with_hanja = sorted(n for n, h in missing.items() if h)
