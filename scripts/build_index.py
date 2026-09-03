@@ -86,6 +86,15 @@ def is_separator(cells: list[str]) -> bool:
     return all(re.fullmatch(r":?-{2,}:?", c) for c in cells if c)
 
 
+def kind_from_heading(heading: str, layer: str) -> str:
+    """현재 층 이름이 소제목에 독립된 낱말로 들어 있으면 그 층을 kind로 쓴다."""
+    if layer in LAYERS and re.search(
+        rf"(?<![가-힣]){re.escape(layer)}(?![가-힣])", heading
+    ):
+        return layer
+    return heading
+
+
 def read_faction(path: Path) -> tuple[list[Row], list[str]]:
     """세력 문서 하나에서 항목을 추출한다. (행 목록, 경고 목록)"""
     warns: list[str] = []
@@ -124,10 +133,10 @@ def read_faction(path: Path) -> tuple[list[Row], list[str]]:
             # 한자 괄호를 뗀 자리에 공백이 남는다. 「계도· 방편」 → 「계도·방편」
             heading = re.sub(r"\s*·\s*", "·", heading)
             heading = re.sub(r"\s+", " ", heading)
-            # '## 무공' 처럼 최상위 절이면 층이 바뀐다. 그 아래 '### 검법'은 kind다
+            # '## 무공'처럼 최상위 절이면 층이 바뀐다. 그 아래 '### 검법'은 kind다.
             if re.match(r"^##[^#]", line):
                 layer = LAYERS.get(heading, "?")
-            kind = heading
+            kind = kind_from_heading(heading, layer)
             in_table = False
             continue
 
