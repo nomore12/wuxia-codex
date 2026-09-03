@@ -18,7 +18,7 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from build_index import is_current
+from build_index import identity_key, is_current
 
 ROOT = Path(__file__).resolve().parent.parent
 INDEX_PATH = ROOT / "canon" / "명칭색인.md"
@@ -234,7 +234,7 @@ def check_entries(rep: Report, is_collection: bool = False) -> None:
         rep.error(None, "수집된 항목이 없다. 표 형식을 확인할 것")
         return
 
-    seen: dict[str, int] = {}
+    seen: dict[tuple[str, str], int] = {}
     for e in rep.entries:
         if not e.hanja or e.hanja == "—":
             rep.error(e.line, f"한자 누락: {e.name}")
@@ -256,10 +256,11 @@ def check_entries(rep: Report, is_collection: bool = False) -> None:
                 f"{e.name} → '{e.kind}'",
             )
 
-        if e.name in seen:
-            rep.error(e.line, f"문서 내 중복: {e.name} (L{seen[e.name]})")
+        key = identity_key(e.name, e.hanja)
+        if key in seen:
+            rep.error(e.line, f"문서 내 중복: {e.name} ({e.hanja}) (L{seen[key]})")
         else:
-            seen[e.name] = e.line
+            seen[key] = e.line
 
     if not is_collection:
         daepyo = [e for e in rep.entries if e.is_daepyo]
@@ -281,8 +282,9 @@ def check_index(rep: Report, sect_id: str) -> None:
         rep.infos.append(f"색인 없음 ({INDEX_PATH.name}) — 대조 생략")
         return
 
-    # 같은 명칭이 여러 세력에 있을 수 있으므로 소유자를 전부 모은다
-    index: dict[str, list[tuple[str, str]]] = {}
+    # 같은 명칭과 한자를 함께 쓰는 세력이 여럿일 수 있으므로 소유자를 전부 모은다.
+    # 한글 명칭만 같고 한자가 다르면 서로 다른 항목이다.
+    index: dict[tuple[str, str], list[tuple[str, str]]] = {}
     cols: dict[str, int] = {}
     for line in INDEX_PATH.read_text(encoding="utf-8").split("\n"):
         if not line.strip().startswith("|"):
@@ -296,7 +298,9 @@ def check_index(rep: Report, sect_id: str) -> None:
             continue
         try:
             name = re.sub(r"\*\*", "", c[cols["명칭"]]).strip()
-            index.setdefault(name, []).append((c[cols["origin"]], c[cols["sect_id"]]))
+            hanja = c[cols["한자"]].strip()
+            key = identity_key(name, hanja)
+            index.setdefault(key, []).append((c[cols["origin"]], c[cols["sect_id"]]))
         except (KeyError, IndexError):
             continue
 
@@ -307,7 +311,8 @@ def check_index(rep: Report, sect_id: str) -> None:
     sect = sect_id or rep.path.stem
     for e in rep.entries:
         # 자기 세력 항목은 제외한다. 색인에 이미 반영되어 있을 수 있다
-        others = [(o, w) for o, w in index.get(e.name, []) if w != sect]
+        key = identity_key(e.name, e.hanja)
+        others = [(o, w) for o, w in index.get(key, []) if w != sect]
         if not others:
             continue
         owners = ", ".join(sorted({w for _, w in others}))

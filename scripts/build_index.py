@@ -47,9 +47,10 @@ generated_by: scripts/build_index.py
 
 | 상황 | 처리 |
 |---|---|
-| 기존 **관용·전승** 명칭과 겹침 | 공통 무공으로 참조. 비고에 「여러 문파에 공통」 |
-| 기존 **창작** 명칭과 겹침 | **다른 이름을 쓴다** |
-| 같은 이름이 다른 세력에 있음 | 임의로 결정하지 말고 보고 |
+| 기존 **관용·전승** 명칭·한자와 모두 겹침 | 공통 무공으로 참조. 비고에 「여러 문파에 공통」 |
+| 기존 **창작** 명칭·한자와 모두 겹침 | **다른 이름을 쓴다** |
+| 같은 이름과 한자가 다른 세력에 있음 | 임의로 결정하지 말고 보고 |
+| 한글 이름은 같으나 한자가 다름 | 서로 다른 항목으로 다룬다 |
 
 `세력` 열은 사람이 읽기 위한 것이고, 대조에 쓰이는 것은 `sect_id` 열이다.
 `층`은 무공·심법·기술·물 넷이며, 세력 문서의 최상위 절에서 뽑는다.
@@ -70,6 +71,11 @@ class Row:
     sect_id: str
     layer: str
     kind: str
+
+
+def identity_key(name: str, hanja: str) -> tuple[str, str]:
+    """같은 항목인지 판정하는 식별자. 한글 명칭과 한자가 모두 같아야 한다."""
+    return name.strip(), hanja.strip()
 
 
 def parse_row(line: str) -> list[str]:
@@ -161,11 +167,12 @@ def build() -> tuple[str, list[str], list[Row], list[str]]:
             rows.extend(r)
             warns.extend(w)
 
-    # 같은 명칭이 여러 세력에 있는 경우를 알린다
-    by_name: dict[str, list[Row]] = {}
+    # 같은 명칭과 한자를 함께 쓰는 세력이 여럿이면 알린다.
+    # 한글 명칭만 같고 한자가 다르면 서로 다른 항목이다.
+    by_item: dict[tuple[str, str], list[Row]] = {}
     for r in rows:
-        by_name.setdefault(r.name, []).append(r)
-    for name, group in by_name.items():
+        by_item.setdefault(identity_key(r.name, r.hanja), []).append(r)
+    for (name, _hanja), group in by_item.items():
         sects = {g.sect_id for g in group}
         if len(sects) > 1:
             origins = {g.origin for g in group}
@@ -174,7 +181,7 @@ def build() -> tuple[str, list[str], list[Row], list[str]]:
             else:
                 warns.append(f"공통 무공: {name} — {', '.join(sorted(sects))}")
 
-    rows.sort(key=lambda r: (r.sect_id, r.layer, r.kind, r.name))
+    rows.sort(key=lambda r: (r.sect_id, r.layer, r.kind, r.name, r.hanja))
 
     lines = [HEADER.rstrip("\n"), ""]
     lines.append("| 명칭 | 한자 | origin | 세력 | sect_id | 층 | 분류 |")

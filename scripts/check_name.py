@@ -14,6 +14,8 @@ canon/명칭색인.md는 800줄이 넘는다. **전문을 읽지 말고 이것�
     python scripts/check_name.py --like 낙매 --origin 창작  # origin으로 거른다
 
 종료 코드: 0 정상 / 1 색인을 읽지 못함
+
+같은 한글 이름에 여러 한자가 있으면 한자별로 나누어 보여준다.
 """
 
 from __future__ import annotations
@@ -118,11 +120,22 @@ def cmd_lookup(rows: list[Row], names: list[str]) -> None:
         if not hits:
             print(f"{name} — 없음")
         else:
-            hanja = hits[0].hanja
-            mark = "" if len(hits) == 1 else f" · {len(hits)}개 세력"
-            print(f"{name} ({hanja}) — 있음{mark}")
+            by_hanja: dict[str, list[Row]] = defaultdict(list)
             for r in hits:
-                print(line_of(r))
+                by_hanja[r.hanja].append(r)
+
+            if len(by_hanja) == 1:
+                hanja, group = next(iter(by_hanja.items()))
+                mark = "" if len(group) == 1 else f" · {len(group)}개 세력"
+                print(f"{name} ({hanja}) — 있음{mark}")
+                for r in group:
+                    print(line_of(r))
+            else:
+                print(f"{name} — 있음 · 한자 {len(by_hanja)}종")
+                for hanja, group in sorted(by_hanja.items()):
+                    print(f"  {hanja} — {len(group)}개 세력")
+                    for r in group:
+                        print(f"  {line_of(r)}")
         print_similar(name, rows, {name})
 
 
