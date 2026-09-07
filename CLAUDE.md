@@ -160,6 +160,16 @@ frontmatter의 `sect_id`는 영문(`sorim`, `dangga`, `cheonma`).
 
 ---
 
+## 의도 기록 (docs/intent/)
+
+되돌리기 비용이 큰 결정, 정전 판단, 검증 규칙 변경은 `docs/intent/`에 기록한다.
+- 규약 전문: `docs/intent/CONVENTION.md` — 작성·조회 전에 반드시 읽는다.
+- append-only. 기존 decision.md 수정 금지. 번복은 새 파일 + supersedes로만.
+- 검수 없이 파일을 만들지 않는다. 초안을 먼저 대화에 제시한다.
+- 파일 수정 착수 전 해당 경로에 active 결정이 있는지 INDEX.md에서 확인한다.
+
+---
+
 ## Git
 
 - 커밋 메시지에 **공동저자(Co-Authored-By) 표기를 넣지 않는다.**

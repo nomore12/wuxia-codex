@@ -23,6 +23,18 @@
 
 ---
 
+## docs/intent/ 취급
+
+`docs/intent/` 이하는 결정 기록 저장소다. 규약 전문은 `docs/intent/CONVENTION.md`.
+
+- `decision.md`의 **내용을 생성하거나 수정하지 않는다.** 판단은 Claude Code 소관이다.
+- 기존 `decision.md`는 어떤 이유로도 편집하지 않는다. 오타 수정도 요청받은 경우에만.
+- `INDEX.md`는 `scripts/build_intent_index.py` 산출물이다. 직접 쓰지 않는다.
+- 승인된 초안을 받아 디렉터리 생성·파일 배치·인덱스 재생성까지만 수행한다.
+- 다른 작업 중 `docs/intent/` 하위 파일을 수정해야 할 상황이 오면 멈추고 보고한다.
+
+---
+
 ## AI 에이전트 독립성 원칙
 
 - **기존 보고서 의존 금지:** 다른 AI나 작업자가 남긴 요약 문서,
