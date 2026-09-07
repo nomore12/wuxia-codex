@@ -45,11 +45,20 @@
 │   ├─ 작업순서.md                1~4차 작업 순서와 상태
 │   └─ AI생성규칙.md              AI 생성 시 금지·주의 사항
 │
+├─ docs/intent/                   결정 기록. 왜 다른 선택지를 버렸는가
+│   ├─ CONVENTION.md              기록 규약. 작성·조회 전에 읽는다
+│   ├─ INDEX.md                   색인 (기계 생성. 손으로 편집하지 않는다)
+│   └─ 0001-*/decision.md         결정 하나에 디렉터리 하나
+│
 ├─ 미확정사항.md                  미확정 사항. 임의로 채우지 않는다
+│
+├─ .githooks/
+│   └─ commit-msg                 커밋 메시지 정리 (「초기 설정」 참조)
 │
 └─ scripts/
     ├─ validate.py                형식·금지어·중복 검증
     ├─ build_index.py             명칭색인.md 재생성
+    ├─ build_intent_index.py      docs/intent/INDEX.md 재생성
     ├─ check_name.py              색인 조회 (전문을 읽지 않기 위한 것)
     └─ build_notebooklm.py        NotebookLM 자료 묶음 생성
 ```
