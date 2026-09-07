@@ -167,6 +167,7 @@ frontmatter의 `sect_id`는 영문(`sorim`, `dangga`, `cheonma`).
 - append-only. 기존 decision.md 수정 금지. 번복은 새 파일 + supersedes로만.
 - 검수 없이 파일을 만들지 않는다. 초안을 먼저 대화에 제시한다.
 - 파일 수정 착수 전 해당 경로에 active 결정이 있는지 INDEX.md에서 확인한다.
+- decision.md를 만들거나 status를 바꾼 직후 `python scripts/build_intent_index.py`를 실행한다.
 
 ---
 

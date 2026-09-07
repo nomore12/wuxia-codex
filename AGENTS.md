@@ -66,8 +66,9 @@
 작업 뒤 반드시 실행한다.
 
 ```
-python scripts/validate.py --all      # 전부 통과해야 한다 (실패 0)통과해야 한다
-python scripts/build_index.py --check # 색인 최신 확인
+python scripts/validate.py --all             # 전부 통과해야 한다 (실패 0)
+python scripts/build_index.py --check        # 명칭색인 최신 확인
+python scripts/build_intent_index.py --check # 의도 기록 색인 최신 확인
 ```
 
 세력 문서의 항목(명칭·한자·origin)을 건드렸다면

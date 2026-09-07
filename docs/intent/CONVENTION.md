@@ -9,13 +9,13 @@
 
 `docs/intent/`는 **diff에 남지 않는 정보**만 보관한다.
 
-| 정보 | 보관 위치 |
-|---|---|
-| 무엇을 바꿨는가 | git diff |
-| 어떤 순서로 바꿨는가 | git log |
+| 정보                          | 보관 위치      |
+| ----------------------------- | -------------- |
+| 무엇을 바꿨는가               | git diff       |
+| 어떤 순서로 바꿨는가          | git log        |
 | 왜 **다른 선택지를 버렸는가** | `docs/intent/` |
-| 그 판단이 딛고 선 **가정** | `docs/intent/` |
-| 그 가정이 깨지는 **조건** | `docs/intent/` |
+| 그 판단이 딛고 선 **가정**    | `docs/intent/` |
+| 그 가정이 깨지는 **조건**     | `docs/intent/` |
 
 커밋 메시지로 충분한 내용은 INTENT에 쓰지 않는다. 중복은 규약을 형해화시킨다.
 
@@ -30,7 +30,8 @@ append-only는 `decision.md`에만 적용된다.
 
 - 되돌리는 비용이 파일 3개 이상의 연쇄 수정을 유발하는 변경
 - 세계관 정전(正典) 판단 — 설정 간 충돌을 한쪽으로 정리한 경우
-- 검증 파이프라인 규칙 추가/변경 (`validate.py`, `build_index.py`, `check_name.py`)
+- 검증 파이프라인 규칙 추가/변경
+  (`validate.py`, `build_index.py`, `build_intent_index.py`, `check_name.py`)
 - 문서 스키마·분류 체계 변경 (4단계 분류, 세력 문서 8종 형식 등)
 - 직관에 반하는 선택 — 6개월 뒤 "왜 이렇게 안 했지"가 나올 만한 것
 - 사용자가 명시적으로 요청한 경우
@@ -85,31 +86,36 @@ docs/intent/
 ---
 id: "0002"
 date: YYYY-MM-DD
-status: active            # active | superseded | retroactive
-supersedes: null          # "0001" 또는 null
-superseded_by: null       # 뒤집힌 뒤 이 필드만 예외적으로 갱신 허용
-scope:                    # 이 결정이 지배하는 경로. glob 허용
+status: active # active | superseded | retroactive
+supersedes: null # "0001" 또는 null
+superseded_by: null # 뒤집힌 뒤 이 필드만 예외적으로 갱신 허용
+scope: # 이 결정이 지배하는 경로. glob 허용
   - scripts/validate.py
-tags: [ci, tooling]       # 아래 tag 목록에서만 선택
+tags: [ci, tooling] # 아래 tag 목록에서만 선택
 ---
 
 # 한 문장 서술형 제목 (결정 내용 자체)
 
 ## 문제
+
 왜 결정이 필요했는가. 관찰된 사실 위주로. 가능하면 수치.
 
 ## 검토한 대안
+
 1. **이름** — 버린 이유. 한두 문장.
 2. **이름** — 버린 이유.
 3. **이름** ← 선택
 
 ## 근거
+
 선택지가 다른 것들을 이긴 이유. 「더 낫다」가 아니라 「무엇을 기준으로 더 나은가」.
 
 ## 가정
+
 - 이 판단이 참이라고 전제하는 것들. 검증 가능한 형태로.
 
 ## 폐기 조건
+
 위 가정이 어떻게 깨지면 이 결정이 무효가 되는가. 그때 이동할 대안 번호.
 ```
 
@@ -147,17 +153,21 @@ tags: [ci, tooling]       # 아래 tag 목록에서만 선택
 변경 작업 착수 전, 해당 scope에 active 상태 결정이 있으면 **먼저 알리고 진행 여부를
 확인한다.** 조용히 뒤집지 않는다.
 
+생성물은 이 조항의 대상이 아니다. `docs/intent/INDEX.md`처럼 스크립트가 재생성하는
+파일은 scope에 실려 있어도 재생성 시 확인을 요구하지 않는다. 확인이 필요한 것은
+생성기와 그 출력 형식을 바꿀 때다.
+
 ---
 
 ## 7. 다중 에이전트 역할 분담
 
 <!-- 프로젝트별 조정 구간 -->
 
-| 에이전트 | 역할 |
-|---|---|
+| 에이전트           | 역할                                                       |
+| ------------------ | ---------------------------------------------------------- |
 | Claude Code (Opus) | 판단이 필요한 전부 — 추출, 초안 작성, 충돌 검토, 정전 판정 |
-| Codex | 승인된 초안의 파일 생성·이동, 스키마 기계적 검증 |
-| Gemini CLI | INDEX 집계, scope 교차 조회, 번복 이력 열거 |
+| Codex              | 승인된 초안의 파일 생성·이동, 스키마 기계적 검증           |
+| Gemini CLI         | INDEX 집계, scope 교차 조회, 번복 이력 열거                |
 
 Codex와 Gemini CLI는 `decision.md`의 **내용을 생성하거나 수정하지 않는다.**
 판단은 Claude Code로 위임한다.
@@ -172,8 +182,10 @@ Codex와 Gemini CLI는 `decision.md`의 **내용을 생성하거나 수정하지
 ## 의도 기록 (docs/intent/)
 
 되돌리기 비용이 큰 결정, 정전 판단, 검증 규칙 변경은 `docs/intent/`에 기록한다.
+
 - 규약 전문: `docs/intent/CONVENTION.md` — 작성·조회 전에 반드시 읽는다.
 - append-only. 기존 decision.md 수정 금지. 번복은 새 파일 + supersedes로만.
 - 검수 없이 파일을 만들지 않는다. 초안을 먼저 대화에 제시한다.
 - 파일 수정 착수 전 해당 경로에 active 결정이 있는지 INDEX.md에서 확인한다.
+- decision.md를 만들거나 status를 바꾼 직후 `python scripts/build_intent_index.py`를 실행한다.
 ```

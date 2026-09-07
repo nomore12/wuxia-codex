@@ -6,7 +6,8 @@ docs/intent/ 아래 NNNN-<slug>/decision.md 를 훑어 docs/intent/INDEX.md 를 
 색인은 **손으로 관리하지 않는다.** 항상 이 스크립트로 재생성한다.
 
 사용법:
-    python scripts/build_intent_index.py
+    python scripts/build_intent_index.py           # 재생성
+    python scripts/build_intent_index.py --check   # 최신 여부만 확인 (쓰지 않음)
 
 frontmatter 위반이 하나라도 있으면 INDEX.md를 쓰지 않고 전부 나열한 뒤 종료한다.
 경고 수준은 없다. 자동 수정(--fix)도 없다. 손으로 고칠 것들이다.
@@ -251,10 +252,11 @@ def render(decisions: list[Decision]) -> str:
 
     lines = [
         "<!-- build_intent_index.py 생성물. 직접 편집하지 마십시오. -->",
+        "<!-- 갱신일은 색인 내용이 실제로 바뀐 날짜다. 스크립트 실행일이 아니다. -->",
         "",
         "# 의도 기록 색인",
         "",
-        f"생성: {date.today().isoformat()}",
+        f"갱신: {date.today().isoformat()}",
         "",
     ]
 
@@ -288,8 +290,18 @@ def render(decisions: list[Decision]) -> str:
 
 # ── 실행 ────────────────────────────────────────────────────────────
 
+# 「갱신:」 줄은 비교에서 뺀다. 그래야 이 줄이 「내용이 바뀐 날」로 남는다
+UPDATED_RE = re.compile(r"^갱신: .*$", re.M)
+
+
+def comparable(text: str) -> str:
+    return UPDATED_RE.sub("갱신:", text)
+
+
 def main() -> int:
-    argparse.ArgumentParser(description="의도 기록 색인 생성").parse_args()
+    ap = argparse.ArgumentParser(description="의도 기록 색인 생성")
+    ap.add_argument("--check", action="store_true", help="최신 여부만 확인 (쓰지 않음)")
+    args = ap.parse_args()
 
     dirs = []
     if INTENT_DIR.is_dir():
@@ -306,11 +318,25 @@ def main() -> int:
         print(f"\n{'─'*50}\n오류 {len(rep.errors)}건 · INDEX.md를 쓰지 않았다", file=sys.stderr)
         return 1
 
-    INTENT_DIR.mkdir(parents=True, exist_ok=True)
-    INDEX_PATH.write_text(render(decisions), encoding="utf-8")
+    content = render(decisions)
+    old = INDEX_PATH.read_text(encoding="utf-8") if INDEX_PATH.exists() else ""
+    current = bool(old) and comparable(old) == comparable(content)
 
-    counts = {s: sum(1 for d in decisions if d.status == s) for s in sorted(VALID_STATUS)}
-    print(f"[OK] {INDEX_PATH.relative_to(ROOT)} · 결정 {len(decisions)}건 "
+    if args.check:
+        if current:
+            print("의도 기록 색인이 최신이다.")
+            return 0
+        print("의도 기록 색인이 최신이 아니다. build_intent_index.py를 실행할 것.",
+              file=sys.stderr)
+        return 1
+
+    # 내용이 같으면 생성일도 그대로 둔다. 의미 없는 diff를 만들지 않기 위함
+    INTENT_DIR.mkdir(parents=True, exist_ok=True)
+    INDEX_PATH.write_text(old if current else content, encoding="utf-8")
+
+    counts = {k: sum(1 for d in decisions if d.status == k) for k in sorted(VALID_STATUS)}
+    status = "변경 없음" if current else "갱신"
+    print(f"[OK] {INDEX_PATH.relative_to(ROOT)} {status} · 결정 {len(decisions)}건 "
           f"(활성 {counts['active']} · 번복 {counts['superseded']} · 소급 {counts['retroactive']})")
     return 0
 
