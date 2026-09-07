@@ -1,0 +1,8 @@
+# 이 저장소는 마크다운 자동 포매팅을 쓰지 않는다.
+# 손으로 잡은 형식이 있고, 생성물과 결정 기록은 자동 수정되면 안 된다.
+#
+# canon/명칭색인.md, docs/intent/INDEX.md — 스크립트 생성물. 포매터가 손대면 --check가 실패한다.
+# docs/intent/0*/decision.md — append-only. 자동 수정은 규약을 도구 레벨에서 뚫는다.
+#
+# 개별 파일을 포매팅하려면 --ignore-path /dev/null로 이 파일을 우회한다.
+*
