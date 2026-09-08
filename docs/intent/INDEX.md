@@ -15,6 +15,7 @@
 | [0004](0004-taesan-rite-broken-twice/decision.md) | 태산의 예는 두 번 끊겼고 두 번째가 마지막이다 | `drafts/연표.md`, `drafts/factions/태산파.md`, `drafts/미결모음.md` | canon, content | 2026-09-08 |
 | [0005](0005-annotate-settings-docs/decision.md) | 설정 문서에는 서력을 병기하고 습작 원고에는 넣지 않는다 | `drafts/factions/`, `drafts/저장소현황.md`, `specs/집필가이드.md` | content, naming | 2026-09-08 |
 | [0006](0006-promote-from-writing-practice/decision.md) | 습작에서 나온 설정은 완결 시 승격 판정으로만 올라간다 | `drafts/writing-practice/`, `specs/집필가이드.md` | content | 2026-09-08 |
+| [0007](0007-character-listing-is-separate/decision.md) | 인물은 승격과 별개로 목록 등재를 판단한다 | `drafts/writing-practice/` | content | 2026-09-08 |
 
 ## 번복된 결정
 
@@ -33,7 +34,7 @@
 | `docs/intent/INDEX.md` | 0001 |
 | `drafts/factions/` | 0003, 0005 |
 | `drafts/factions/태산파.md` | 0004 |
-| `drafts/writing-practice/` | 0006 |
+| `drafts/writing-practice/` | 0006, 0007 |
 | `drafts/미결모음.md` | 0004 |
 | `drafts/연표.md` | 0002, 0003, 0004 |
 | `drafts/저장소현황.md` | 0005 |
